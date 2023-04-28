@@ -1,0 +1,23 @@
+{
+	"name": "centre",
+	"socket_id": 2,
+	"sockets": [2,2,2,2],
+	"prototypes": [
+		{
+			"rotation": 0,
+			"src": "centre.png"
+		},
+		{
+			"rotation": 1,
+			"src": "centre.png"
+		},
+		{
+			"rotation": 2,
+			"src": "centre.png"
+		},
+		{
+			"rotation": 3,
+			"src": "centre.png"
+		}
+	]
+}

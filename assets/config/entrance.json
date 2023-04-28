@@ -1,0 +1,23 @@
+{
+	"name": "entrance",
+	"socket_id": 1,
+	"sockets": [3,1,2,1],
+	"prototypes": [
+		{
+			"rotation": 0,
+			"src": "entrance-top.png"
+		},
+		{
+			"rotation": 1,
+			"src": "entrance-right.png"
+		},
+		{
+			"rotation": 2,
+			"src": "entrance-bottom.png"
+		},
+		{
+			"rotation": 3,
+			"src": "entrance-left.png"
+		}
+	]
+}

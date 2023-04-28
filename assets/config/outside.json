@@ -1,0 +1,24 @@
+{
+	"name": "outside",
+	"socket_id": 0,
+	"sockets": [0,0,0,0],
+	"prototypes": [
+		{
+			"rotation": 0,
+			"src": "outside.png"
+		},
+		{
+			"rotation": 1,
+			"src": "outside.png"
+		},
+		{
+			"rotation": 2,
+			"src": "outside.png"
+		},
+		{
+			"rotation": 3,
+			"src": "outside.png"
+		}
+	]
+}
+

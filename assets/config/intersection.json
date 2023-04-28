@@ -1,0 +1,24 @@
+{
+	"name": "intersection",
+	"socket_id": 3,
+	"sockets": [3,3,3,3],
+	"prototypes": [
+		{
+			"rotation": 0,
+			"src": "intersection.png"
+		},
+		{
+			"rotation": 1,
+			"src": "intersection.png"
+		},
+		{
+			"rotation": 2,
+			"src": "intersection.png"
+		},
+		{
+			"rotation": 3,
+			"src": "intersection.png"
+		}
+	]
+}
+
