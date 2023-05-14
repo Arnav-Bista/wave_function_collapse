@@ -1,6 +1,4 @@
-use std::env;
 use std::collections;
-use bevy::utils::hashbrown::hash_map;
 use rand::Rng;
 mod tile;
 
@@ -13,7 +11,7 @@ pub fn main() {
     let mut data = initialise(data, 10);
     let mut count = 0;
     println!("Begin!");
-    while !iterate(&mut data, 4) {
+    while !iterate(&mut data, 32) {
         println!("Iteration {count}");
         count += 1;
     }
@@ -79,6 +77,7 @@ fn iterate(data: &mut Vec<Vec<Vec<tile::Tile>>>, maximum_entropy: usize) -> bool
         least_entropy = data[least_index.0][least_index.1].len();
     }
     // Remove a random tile
+    println!("{} {}", least_entropy, data[least_index.0][least_index.1].len());
     data[least_index.0][least_index.1].remove(rng.gen_range(0..least_entropy));
 
     // Update all affected cells
@@ -161,18 +160,20 @@ fn make_compatible(data: &mut Vec<Vec<Vec<tile::Tile>>>, target_index: (usize,us
             tile.get_socket(direction_from_source),
             1 + hashmap.get(&tile.get_socket(direction_from_source)).unwrap_or(&0)
         );
-    }
+    }   
+    // One liner magic (it's cursed)
+    // data[target_index.0][target_index.1].retain(|i| {!(*hashmap.get(&i.get_socket_id()).unwrap_or(&0) == 0 && {changed = true; true})});
+    // Sadly, it's inefficient
 
-    data[target_index.0][target_index.1].retain(|i| {
-        let res = *hashmap.get(&i.get_socket_id()).unwrap_or(&0);
-        if res == 0 {
-            changed = true;
-            return false;
+    // Faster Deletion but does not preserve order (which is irrelevant) 
+    let mut i = 0;
+    let target = &mut data[target_index.0][target_index.1];
+    while i < target.len() {
+        if *hashmap.get(&target[i].get_socket_id()).unwrap_or(&0) == 0 {
+            target.swap_remove(i);
         }
-        else {
-            return true;
-        }
-    });
+        i += 1;
+    }
 
     changed
 }

@@ -9,6 +9,8 @@ pub struct Tile {
     sockets: Vec<u8>,
     #[serde(skip_deserializing)]
     current_rotation: u8,
+    #[serde(skip_deserializing)]
+    id: u32,
     src: Vec<String>,
 }
 
