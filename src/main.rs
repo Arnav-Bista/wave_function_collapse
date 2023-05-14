@@ -13,7 +13,8 @@ pub fn main() {
     let mut data = initialise(data, 10);
     // println!("{:#?}",board);
     let mut count = 0;
-    while iterate(&mut data, 4) {
+    println!("Begin!");
+    while !iterate(&mut data, 4) {
         println!("Iteration {count}");
         count += 1;
     }
@@ -153,7 +154,17 @@ fn make_compatible(data: &mut Vec<Vec<Vec<tile::Tile>>>, target_index: (usize,us
             1 + hashmap.get(&tile.get_socket(direction_from_source)).unwrap_or(&0)
         );
     }
-    data[target_index.0][target_index.1].retain(|i| {*hashmap.get(&i.get_socket_id()).unwrap_or(&0) != 0 && {changed = true; true}});
+
+    data[target_index.0][target_index.1].retain(|i| {
+        let res = *hashmap.get(&i.get_socket_id()).unwrap_or(&0);
+        if res == 0 {
+            changed = true;
+            return false;
+        }
+        else {
+            return true;
+        }
+    });
 
     changed
 }
