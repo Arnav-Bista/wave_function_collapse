@@ -11,14 +11,13 @@ pub fn main() {
     let data = tile::Tile::get_tile_list(DEFAULT_DIR)
         .expect("Error loading configurations.");
     let mut data = initialise(data, 10);
-    // println!("{:#?}",board);
     let mut count = 0;
     println!("Begin!");
     while !iterate(&mut data, 4) {
         println!("Iteration {count}");
         count += 1;
     }
-
+    println!("{:#?}",data[0][0]);
 }
 
 fn initialise(data: Vec<tile::Tile>, size: u32) -> Vec<Vec<Vec<tile::Tile>>> {
@@ -62,8 +61,11 @@ fn iterate(data: &mut Vec<Vec<Vec<tile::Tile>>>, maximum_entropy: usize) -> bool
             }
         }
     }
-    
-    if highest_entropy == least_entropy {
+
+    if completed {
+        return true;
+    }    
+    if highest_entropy != 1 && highest_entropy == least_entropy {
         // Pick a cell by random
         loop {
             least_index = (
@@ -74,8 +76,8 @@ fn iterate(data: &mut Vec<Vec<Vec<tile::Tile>>>, maximum_entropy: usize) -> bool
                 break;
             }
         }
+        least_entropy = data[least_index.0][least_index.1].len();
     }
-    
     // Remove a random tile
     data[least_index.0][least_index.1].remove(rng.gen_range(0..least_entropy));
 
@@ -144,6 +146,12 @@ fn update(data: &mut Vec<Vec<Vec<tile::Tile>>>,origin_index: (usize,usize), orig
 }
 
 fn make_compatible(data: &mut Vec<Vec<Vec<tile::Tile>>>, target_index: (usize,usize), source_index: (usize, usize), direction_from_source: u8) -> bool {
+    if data[target_index.0][target_index.1].len() == 1 {
+        if data[source_index.0][source_index.1].len() == 1 {
+            return false;
+        }
+        return make_compatible(data, source_index, target_index, direction_from_source);
+    }
     // 0 Up 1 Right 2 Down 3 Left
     let mut hashmap: collections::HashMap<u8,u8> = collections::HashMap::new();
     let mut changed = false;
