@@ -31,4 +31,12 @@ impl Tile {
     pub fn set_current_rotation(&mut self, rotation: u8) {
         self.current_rotation = rotation;
     }
+
+    pub fn get_socket(&self, index: u8) -> u8 {
+        self.sockets[(index + self.current_rotation) as usize % self.sockets.len()]
+    }
+
+    pub fn get_socket_id(&self) -> u8 {
+        self.socket_id
+    }
 }
