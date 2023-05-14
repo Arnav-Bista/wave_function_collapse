@@ -2,22 +2,10 @@
 	"name": "wall",
 	"socket_id": 1,
 	"sockets": [0,1,2,1],
-	"prototypes": [
-		{
-			"rotation": 0,
-			"src": "wall-top.png"
-		},
-		{
-			"rotation": 1,
-			"src": "wall-right.png"
-		},
-		{
-			"rotation": 2,
-			"src": "wall-bottom.png"
-		},
-		{
-			"rotation": 3,
-			"src": "wall-left.png"
-		}
+	"src": [
+			"wall-top.png",
+			"wall-right.png",
+			"wall-bottom.png",
+			"wall-left.png"
 	]
 }

@@ -2,22 +2,10 @@
 	"name": "corner",
 	"socket_id": 1,
 	"sockets": [0,1,1,0],
-	"prototypes": [
-		{
-			"rotation": 0,
-			"src": "corner-top-left.png"
-		},
-		{
-			"rotation": 1,
-			"src": "corner-top-right.png"
-		},
-		{
-			"rotation": 2,
-			"src": "corner-bottom-right.png"
-		},
-		{
-			"rotation": 3,
-			"src": "corner-bottom-left.png"
-		}
+	"src": [
+			"corner-top-left.png",
+			"corner-top-right.png",
+			"corner-bottom-right.png",
+			"corner-bottom-left.png"
 	]
 }

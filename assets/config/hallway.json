@@ -2,22 +2,10 @@
 	"name": "hallway",
 	"socket_id": 3,
 	"sockets": [3,0,3,0],
-	"prototypes": [
-		{
-			"rotation": 0,
-			"src": "hallway-vertical.png"
-		},
-		{
-			"rotation": 1,
-			"src": "hallway-horizontal.png"
-		},
-		{
-			"rotation": 2,
-			"src": "hallway-vertical.png"
-		},
-		{
-			"rotation": 3,
-			"src": "hallway-horizontal.png"
-		}
+	"src": [
+			"hallway-vertical.png",
+			"hallway-horizontal.png",
+			"hallway-vertical.png",
+			"hallway-horizontal.png"
 	]
 }

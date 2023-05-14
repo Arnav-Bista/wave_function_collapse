@@ -2,23 +2,11 @@
 	"name": "centre-object",
 	"socket_id": 2,
 	"sockets": [2,2,2,2],
-	"prototypes": [
-		{
-			"rotation": 0,
-			"src": "centre-object.png"
-		},
-		{
-			"rotation": 1,
-			"src": "centre-object.png"
-		},
-		{
-			"rotation": 2,
-			"src": "centre-object.png"
-		},
-		{
-			"rotation": 3,
-			"src": "centre-object.png"
-		}
+	"src": [
+			"centre-object.png",
+			"centre-object.png",
+			"centre-object.png",
+			"centre-object.png"
 	]
 }
 
