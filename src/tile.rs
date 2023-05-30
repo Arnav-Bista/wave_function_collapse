@@ -25,7 +25,10 @@ impl Tile {
                 .expect("Could not open file.");
             let tile: Tile = serde_json::from_str(&file_json)
                 .unwrap_or_else(|_| panic!("Error parsing '{}' check if the path is set up properly.", path.unwrap().path().display()));
-            result.push(tile);
+            for rotation in 0..4 {
+                tile.set_current_rotation(rotation);
+                result.push(tile.clone());
+            }
         }
         Ok(result)
     }
