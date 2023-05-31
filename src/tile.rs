@@ -23,7 +23,7 @@ impl Tile {
             // println!("Name: {}", path.unwrap().path().display());
             let file_json = fs::read_to_string(path.as_ref().unwrap().path())
                 .expect("Could not open file.");
-            let tile: Tile = serde_json::from_str(&file_json)
+            let mut tile: Tile = serde_json::from_str(&file_json)
                 .unwrap_or_else(|_| panic!("Error parsing '{}' check if the path is set up properly.", path.unwrap().path().display()));
             for rotation in 0..4 {
                 tile.set_current_rotation(rotation);

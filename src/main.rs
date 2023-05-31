@@ -12,21 +12,16 @@ pub fn main() {
     let tiles = tile::Tile::get_tile_list(DEFAULT_DIR)
         .expect("Error loading configurations.");
     let size = 10;
-    let data = board::Board::new(size);
-    data.init(tiles);
+    let mut data = board::Board::init(size, tiles);
     let mut count = 0;
     while !iterate(&mut data, 32) {
         println!("Iteration {count}");
         count += 1;
     }
-    // println!("{:#?}",data[0][0]);
-    // App::new()
-    //     .add_plugin(DefaultPlugins)
-    //     .add_startup_system(setup)
-        // .run();
+    dbg!(data);
 }
 
-fn iterate(data: board::Board, maximum_entropy: usize) -> bool {
+fn iterate(data: &mut board::Board, maximum_entropy: usize) -> bool {
     let mut completed: bool = true;
     let mut least_entropy: usize = maximum_entropy;
     let mut highest_entropy: usize = 0; 
@@ -70,10 +65,10 @@ fn iterate(data: board::Board, maximum_entropy: usize) -> bool {
     data.remove(least_index.0, least_index.1, rng.gen_range(0..least_entropy as u32));
 
     // Update all affected cells
-    update(&mut data, least_index, 0);
-    update(&mut data, least_index, 1);
-    update(&mut data, least_index, 2);
-    update(&mut data, least_index, 3);
+    update(data, least_index, 0);
+    update(data, least_index, 1);
+    update(data, least_index, 2);
+    update(data, least_index, 3);
 
     completed
 }
@@ -114,7 +109,7 @@ fn update(data: &mut board::Board, origin_index: (u32,u32), origin_direction: u8
         }
         _ => panic!("Invalid origin_direciton value")
     }
-    
+
     if make_compatible(data, target_index, origin_index, origin_direction) {
         // Recurse
         if origin_direction != 0 {
@@ -144,7 +139,8 @@ fn make_compatible(data: &mut board::Board, target_index: (u32,u32), source_inde
     let mut hashmap: collections::HashMap<u8,u8> = collections::HashMap::new();
     let mut changed = false;
 
-    for tile in &data(source_index.0,source_index.1) {
+    for id in data.get(source_index.0,source_index.1) {
+        let tile = data.get_tile(*id);
         hashmap.insert(
             tile.get_socket(direction_from_source),
             1 + hashmap.get(&tile.get_socket(direction_from_source)).unwrap_or(&0)
@@ -156,23 +152,14 @@ fn make_compatible(data: &mut board::Board, target_index: (u32,u32), source_inde
 
     // Faster Deletion but does not preserve order (which is irrelevant) 
     let mut i = 0;
-    let target = &mut data[target_index.0][target_index.1];
-    while i < target.len() {
-        if *hashmap.get(&target[i].get_socket_id()).unwrap_or(&0) == 0 {
-            target.swap_remove(i);
+    while i < data.get(target_index.0,target_index.1).len() {
+        if *hashmap.get(&data.get_tile(data.get(target_index.0,target_index.1)[i]).get_socket_id()).unwrap_or(&0) == 0 {
+            data.get_mut(target_index.0, target_index.1).swap_remove(i);
+            changed = true;
         }
         i += 1;
     }
 
     changed
-}
-
-fn setup(mut commands: Commands) {
-    commands.spawn_window(WindowDescriptor {
-        title: "My Window".into(),
-        width: 800.0,
-        height: 600.0,
-        resizable: true,
-    });
 }
 
