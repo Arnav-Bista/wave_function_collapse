@@ -19,8 +19,13 @@ pub fn main() {
         println!("Iteration {count}");
         count += 1;
     }
-    println!("{:?}",data);
+    // println!("{:?}",data);
     // dbg!(data);
+    App::new()
+        .add_plugins(DefaultPlugins)            
+        .insert_resource(data)
+        .add_startup_system(setup)
+        .run();
 }
 
 fn iterate(data: &mut board::Board, maximum_entropy: usize) -> bool {
@@ -33,7 +38,7 @@ fn iterate(data: &mut board::Board, maximum_entropy: usize) -> bool {
     for i in 0..data.size() {
         for j in 0..data.size() {
             let entropy = data.get(i,j).len();
-            dbg!(data.get(i,j));
+            // dbg!(data.get(i,j));
             if entropy != 1 {
                 completed = false;
             }
@@ -64,7 +69,7 @@ fn iterate(data: &mut board::Board, maximum_entropy: usize) -> bool {
         least_entropy = data.get(least_index.0,least_index.1).len();
     }
     // Remove a random tile
-    println!("{} {}", least_entropy, data.get(least_index.0,least_index.1).len());
+    // println!("{} {}", least_entropy, data.get(least_index.0,least_index.1).len());
     data.remove(least_index.0, least_index.1, rng.gen_range(0..least_entropy as u32));
 
     // Update all affected cells
@@ -77,7 +82,7 @@ fn iterate(data: &mut board::Board, maximum_entropy: usize) -> bool {
 }
 
 fn update(data: &mut board::Board, origin_index: (u32,u32), origin_direction: u8) {
-    println!("Update!");
+    // println!("Update!");
     // 0 Up 1 Right 2 Down 3 Left
     let mut target_index: (u32,u32) = origin_index;
     // edge cases
@@ -165,3 +170,19 @@ fn make_compatible(data: &mut board::Board, target_index: (u32,u32), source_inde
     changed
 }
 
+
+fn setup(mut commands: Commands, data: Res<board::Board>, asset_server: Res<AssetServer>) {
+    commands.spawn(Camera2dBundle::default());
+    let scale = Vec3::new(2.0,2.0,2.0);
+    for i in 0..data.size() {
+        for j in 0..data.size() {
+            // let position = Vec3::new((i as f32) * 10.0, (j as f32) * 10.0, 0.0);
+            let transform = Transform::from_xyz(i as f32 * 20.0, j as f32 * 20.0, 1.0).with_scale(scale);
+            commands.spawn(SpriteBundle {
+                texture: asset_server.load("images/".to_owned() + data.get_tile_from_data(i, j).src()),
+                transform,
+                ..default()
+            });
+        }
+    }
+}

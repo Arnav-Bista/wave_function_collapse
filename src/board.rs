@@ -1,7 +1,9 @@
 use std::collections;
+use bevy::prelude::Resource;
+
 use crate::tile;
 
-#[derive(Debug)]
+#[derive(Debug,Resource)]
 pub struct Board {
     mappings: collections::HashMap<u32,tile::Tile>,
     data: Vec<Vec<Vec<u32>>>,
@@ -49,6 +51,10 @@ impl Board {
 
     pub fn get_mut(&mut self, i: u32, j:u32) -> &mut Vec<u32> {
         &mut self.data[i as usize][j as usize]
+    }
+
+    pub fn get_tile_from_data(&self, i: u32, j: u32) -> &tile::Tile {
+        self.get_tile(self.get(i,j)[0 as usize])
     }
 
     pub fn size(&self) -> u32 {

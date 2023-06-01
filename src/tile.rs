@@ -44,4 +44,8 @@ impl Tile {
     pub fn get_socket_id(&self) -> u8 {
         self.socket_id
     }
+
+    pub fn src(&self) -> &String {
+        &self.src[self.current_rotation as usize]
+    }
 }
