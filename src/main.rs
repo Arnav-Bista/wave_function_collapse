@@ -11,14 +11,16 @@ pub fn main() {
     // let args: Vec<String> = env::args().collect();
     let tiles = tile::Tile::get_tile_list(DEFAULT_DIR)
         .expect("Error loading configurations.");
+    let tiles_len = tiles.len();
     let size = 10;
     let mut data = board::Board::init(size, tiles);
     let mut count = 0;
-    while !iterate(&mut data, 32) {
+    while !iterate(&mut data, tiles_len) {
         println!("Iteration {count}");
         count += 1;
     }
-    dbg!(data);
+    println!("{:?}",data);
+    // dbg!(data);
 }
 
 fn iterate(data: &mut board::Board, maximum_entropy: usize) -> bool {
@@ -31,6 +33,7 @@ fn iterate(data: &mut board::Board, maximum_entropy: usize) -> bool {
     for i in 0..data.size() {
         for j in 0..data.size() {
             let entropy = data.get(i,j).len();
+            dbg!(data.get(i,j));
             if entropy != 1 {
                 completed = false;
             }
@@ -146,16 +149,15 @@ fn make_compatible(data: &mut board::Board, target_index: (u32,u32), source_inde
             1 + hashmap.get(&tile.get_socket(direction_from_source)).unwrap_or(&0)
         );
     }   
-    // One liner magic (it's cursed)
-    // data[target_index.0][target_index.1].retain(|i| {!(*hashmap.get(&i.get_socket_id()).unwrap_or(&0) == 0 && {changed = true; true})});
-    // Sadly, it's inefficient
 
     // Faster Deletion but does not preserve order (which is irrelevant) 
     let mut i = 0;
     while i < data.get(target_index.0,target_index.1).len() {
         if *hashmap.get(&data.get_tile(data.get(target_index.0,target_index.1)[i]).get_socket_id()).unwrap_or(&0) == 0 {
             data.get_mut(target_index.0, target_index.1).swap_remove(i);
+            // println!("deletion!");
             changed = true;
+            // println!("{:?}", data.get(target_index.0,target_index.1));
         }
         i += 1;
     }

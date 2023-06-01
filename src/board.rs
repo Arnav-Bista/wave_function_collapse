@@ -21,9 +21,9 @@ impl Board {
             id += 1;
         }
         let defaut_vec: Vec<u32> = (0..id).collect();
-        for i in 0..id {
+        for i in 0..size {
             board.data.push(Vec::new());
-            for _ in 0..id {
+            for _ in 0..size {
                 board.data[i as usize].push(defaut_vec.clone());
             }
         }
