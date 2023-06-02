@@ -3,6 +3,8 @@ use bevy::prelude::*;
 use rand::Rng;
 mod board;
 mod tile;
+mod direction;
+use direction::Direction;
 
 const DEFAULT_DIR: &str = "./assets/config/";
 const DEFAULT_IMAGE_DIR: &str = "./assets/images/";
@@ -73,100 +75,97 @@ fn iterate(data: &mut board::Board, maximum_entropy: usize) -> bool {
     data.remove(least_index.0, least_index.1, rng.gen_range(0..least_entropy as u32));
 
     // Update all affected cells
-    update(data, least_index, 0);
-    update(data, least_index, 1);
-    update(data, least_index, 2);
-    update(data, least_index, 3);
+    update(data, least_index, Direction::Up);
+    update(data, least_index, Direction::Right);
+    update(data, least_index, Direction::Down);
+    update(data, least_index, Direction::Left);
 
     completed
 }
 
-fn update(data: &mut board::Board, origin_index: (u32,u32), origin_direction: u8) {
+fn update(data: &mut board::Board, origin_index: (u32,u32), origin_direction: Direction) {
     // println!("Update!");
     // 0 Up 1 Right 2 Down 3 Left
     let mut target_index: (u32,u32) = origin_index;
     // edge cases
     match origin_direction {
-        // Up
-        0 => {
+        Direction::Up => {
             if origin_index.0 == 0 {
                 return;
             }
             target_index.0 -= 1;
         }
-        // Right
-        1 => {
+        Direction::Right => {
             if origin_index.1 == data.size() - 1 {
                 return;
             }
             target_index.1 += 1;
         }
-        // Down
-        2 => {
+        Direction::Down => {
             if origin_index.0 == data.size() - 1 {
                 return;
             }
             target_index.0 += 1;
         }
-        // Left
-        3 => {
+        Direction::Left => {
             if origin_index.1 == 0 {
                 return;
             }
             target_index.1 -= 1;
         }
-        _ => panic!("Invalid origin_direciton value")
     }
 
-    if make_compatible(data, target_index, origin_index, origin_direction) {
+    if make_compatible(data, target_index, origin_index, &origin_direction) {
         // Recurse
-        if origin_direction != 0 {
-            update(data, target_index, 0);
+        if !matches!(origin_direction,Direction::Up) {
+            update(data, target_index, Direction::Up);
         }
-        if origin_direction != 1 {
-            update(data, target_index, 1);
+        if !matches!(origin_direction,Direction::Right){
+            update(data, target_index, Direction::Right);
         }
-        if origin_direction != 2 {
-            update(data, target_index, 2);
+        if !matches!(origin_direction,Direction::Down) {
+            update(data, target_index, Direction::Down);
         }
-        if origin_direction != 3 {
-            update(data, target_index, 3);
+        if !matches!(origin_direction,Direction::Left) {
+            update(data, target_index, Direction::Left);
         }
     }
 
 }
 
-fn make_compatible(data: &mut board::Board, target_index: (u32,u32), source_index: (u32, u32), direction_from_source: u8) -> bool {
+fn make_compatible(data: &mut board::Board, target_index: (u32,u32), source_index: (u32, u32), direction_from_source: &Direction) -> bool {
     if data.get(target_index.0,target_index.1).len() == 1 {
         if data.get(source_index.0,source_index.1).len() == 1 {
             return false;
         }
         return make_compatible(data, source_index, target_index, direction_from_source);
     }
-    // 0 Up 1 Right 2 Down 3 Left
     let mut hashmap: collections::HashMap<u8,u8> = collections::HashMap::new();
     let mut changed = false;
 
     for id in data.get(source_index.0,source_index.1) {
         let tile = data.get_tile(*id);
         hashmap.insert(
-            tile.get_socket(direction_from_source),
-            1 + hashmap.get(&tile.get_socket(direction_from_source)).unwrap_or(&0)
+            tile.get_socket(direction_from_source.get_value()),
+            1 + hashmap.get(&tile.get_socket(direction_from_source.get_value())).unwrap_or(&0)
         );
     }   
-
+    
     // Faster Deletion but does not preserve order (which is irrelevant) 
     let mut i = 0;
-    while i < data.get(target_index.0,target_index.1).len() {
-        if *hashmap.get(&data.get_tile(data.get(target_index.0,target_index.1)[i]).get_socket_id()).unwrap_or(&0) == 0 {
+    let mut entropy = data.get(target_index.0,target_index.1).len();
+    while i < entropy {
+        let id = data.get(target_index.0,target_index.1)[i];
+        let tile = data.get_tile(id);
+        if !hashmap.contains_key(&tile.get_socket(direction_from_source.get_opposite().get_value())) {
             data.get_mut(target_index.0, target_index.1).swap_remove(i);
-            // println!("deletion!");
             changed = true;
-            // println!("{:?}", data.get(target_index.0,target_index.1));
+            entropy -= 1;
+            println!("{:?}",data.get_data());
+            continue;
         }
         i += 1;
     }
-
     changed
 }
 
