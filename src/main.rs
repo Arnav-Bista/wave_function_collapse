@@ -31,6 +31,7 @@ pub fn main() {
 }
 
 fn iterate(data: &mut board::Board, maximum_entropy: usize) -> bool {
+    data.flush();
     let mut completed: bool = true;
     let mut least_entropy: usize = maximum_entropy;
     let mut highest_entropy: usize = 0; 
@@ -73,6 +74,8 @@ fn iterate(data: &mut board::Board, maximum_entropy: usize) -> bool {
     // Remove a random tile
     // println!("{} {}", least_entropy, data.get(least_index.0,least_index.1).len());
     data.remove(least_index.0, least_index.1, rng.gen_range(0..least_entropy as u32));
+    
+    data.update(least_index.0, least_index.1);
 
     // Update all affected cells
     update(data, least_index, Direction::Up);
@@ -115,7 +118,7 @@ fn update(data: &mut board::Board, origin_index: (u32,u32), origin_direction: Di
         }
     }
 
-    if make_compatible(data, target_index, origin_index, &origin_direction) {
+    if !data.get_update(target_index.0, target_index.1) && make_compatible(data, target_index, origin_index, &origin_direction) {
         // Recurse
         if !matches!(origin_direction,Direction::Up) {
             update(data, target_index, Direction::Up);
@@ -134,20 +137,13 @@ fn update(data: &mut board::Board, origin_index: (u32,u32), origin_direction: Di
 }
 
 fn make_compatible(data: &mut board::Board, target_index: (u32,u32), source_index: (u32, u32), direction_from_source: &Direction) -> bool {
-    if data.get(target_index.0,target_index.1).len() == 1 {
-        if data.get(source_index.0,source_index.1).len() == 1 {
-            return false;
-        }
-        return make_compatible(data, source_index, target_index, direction_from_source);
-    }
-    let mut hashmap: collections::HashMap<u8,u8> = collections::HashMap::new();
+    let mut hashset: collections::HashSet<u8> = collections::HashSet::new();
     let mut changed = false;
 
     for id in data.get(source_index.0,source_index.1) {
         let tile = data.get_tile(*id);
-        hashmap.insert(
+        hashset.insert(
             tile.get_socket(direction_from_source.get_value()),
-            1 + hashmap.get(&tile.get_socket(direction_from_source.get_value())).unwrap_or(&0)
         );
     }   
     
@@ -157,15 +153,15 @@ fn make_compatible(data: &mut board::Board, target_index: (u32,u32), source_inde
     while i < entropy {
         let id = data.get(target_index.0,target_index.1)[i];
         let tile = data.get_tile(id);
-        if !hashmap.contains_key(&tile.get_socket(direction_from_source.get_opposite().get_value())) {
+        if !hashset.contains(&tile.get_socket(direction_from_source.get_opposite().get_value())) {
             data.get_mut(target_index.0, target_index.1).swap_remove(i);
             changed = true;
             entropy -= 1;
-            println!("{:?}",data.get_data());
             continue;
         }
         i += 1;
     }
+    data.update(target_index.0, target_index.1);
     changed
 }
 

@@ -7,6 +7,7 @@ use crate::tile;
 pub struct Board {
     mappings: collections::HashMap<u32,tile::Tile>,
     data: Vec<Vec<Vec<u32>>>,
+    updated: Vec<Vec<bool>>,
     size: u32
 }
 
@@ -15,6 +16,7 @@ impl Board {
         let mut board = Self {
             mappings: collections::HashMap::new(),
             data: Vec::new(),
+            updated: vec![vec![false;size as usize]; size as usize],
             size
         };
         let mut id: u32 = 0;
@@ -63,5 +65,21 @@ impl Board {
 
     pub fn remove(&mut self, i: u32, j: u32, delete_index: u32) {
         self.data[i as usize][j as usize].remove(delete_index as usize);
+    }
+
+    pub fn flush(&mut self) {
+        for i in 0..self.size {
+            for j in 0..self.size {
+                self.updated[i as usize][j as usize] = false;
+            }
+        }
+    }
+
+    pub fn update(&mut self, i: u32, j: u32) {
+        self.updated[i as usize][j as usize] = true;
+    }
+
+    pub fn get_update(&self, i: u32, j: u32) -> bool {
+        self.updated[i as usize][j as usize]
     }
 }
