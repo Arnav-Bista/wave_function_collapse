@@ -1,5 +1,4 @@
 
-
 pub struct Tile{
     id: usize,
     sockets: Vec<usize>,
@@ -13,5 +12,13 @@ impl Tile {
             sockets,
             rotation
         }
+    }
+
+    pub fn get_socket(&self, index: usize) -> usize {
+        self.sockets[(index + self.rotation) % self.sockets.len()]
+    }
+
+    pub fn get_id(&self) -> usize {
+        self.id
     }
 }

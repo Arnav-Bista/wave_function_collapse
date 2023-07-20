@@ -3,7 +3,7 @@ use std::fs;
 
 use image::{self, DynamicImage, GenericImageView};
 
-use super::direction::{Direction, self};
+use super::direction::Direction;
 use super::tile::Tile;
 
 
@@ -31,6 +31,46 @@ impl Board {
         }
     }
 
+    pub fn width(&self) -> usize {
+        self.width
+    }
+
+    pub fn height(&self) -> usize {
+        self.height
+    }
+
+    pub fn get_data(&mut self) -> &Vec<Vec<HashSet<usize>>> {
+        &self.data
+    }
+
+    pub fn get(&self, x: usize, y: usize) -> &HashSet<usize> {
+        &self.data[y][x]
+    }
+
+    pub fn get_tile(&self, id: usize) -> &Tile {
+        match self.tiles.get(&id) {
+            Some(tile) => tile,
+            None => {
+                for tile in self.tiles.values() {
+                    println!("{}", tile.get_id());
+                }
+                panic!("ERROR {}",id);
+            },
+        }
+    }
+
+    pub fn get_mut(&mut self, x: usize, y:usize) -> &mut HashSet<usize> {
+        &mut self.data[y][x]
+    }
+
+    pub fn get_entropy(&self, x:usize, y: usize) -> usize {
+        self.data[y][x].len()
+    }
+
+    pub fn remove_tile_from_data(&mut self, x:usize, y:usize, id: usize) {
+        self.data[y][x].remove(&id);
+    }
+
     pub fn init(&mut self, path: String) {
         for file in fs::read_dir(path).unwrap() {
             let path = file.unwrap().path();
@@ -50,7 +90,7 @@ impl Board {
             }
         }
         println!("Tile reading done.");
-        let set: HashSet<usize> = (0..self.tile_id + 1).collect();
+        let set: HashSet<usize> = (0..self.tile_id).collect();
         let row: Vec<HashSet<usize>> = vec![set.clone(); self.width];
         for i in 0..self.height {
             self.data.push(row.clone());
