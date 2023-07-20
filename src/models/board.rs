@@ -33,8 +33,12 @@ impl Board {
 
     pub fn init(&mut self, path: String) {
         for file in fs::read_dir(path).unwrap() {
+            let path = file.unwrap().path();
+            if fs::metadata(&path).unwrap().is_dir() {
+                continue;
+            }
             let mut sockets: Vec<usize> = vec![0;4];
-            let img = image::open(file.unwrap().path()).unwrap();
+            let img = image::open(path).unwrap();
             sockets[0] = self.get_socket_id(&img, Direction::UP);
             sockets[1] = self.get_socket_id(&img, Direction::RIGHT);
             sockets[2] = self.get_socket_id(&img, Direction::DOWN);
