@@ -2,6 +2,9 @@ use std::collections::{hash_map, HashMap, HashSet};
 use std::fs;
 
 use image::{self, DynamicImage, GenericImageView};
+use rand::Rng;
+use rand::rngs::ThreadRng;
+use rand::seq::IteratorRandom;
 
 use super::direction::Direction;
 use super::tile::Tile;
@@ -15,7 +18,8 @@ pub struct Board {
     tiles: HashMap<usize, Tile>,
     socket_hash: HashMap<Vec<u32>, usize>,
     socket_id: usize,
-    tile_id: usize
+    tile_id: usize,
+    rng: ThreadRng
 }
 
 impl Board {
@@ -28,6 +32,7 @@ impl Board {
             socket_hash: HashMap::new(),
             socket_id: 0,
             tile_id: 0,
+            rng: rand::thread_rng()
         }
     }
 
@@ -45,6 +50,10 @@ impl Board {
 
     pub fn get(&self, x: usize, y: usize) -> &HashSet<usize> {
         &self.data[y][x]
+    }
+
+    pub fn set(&mut self, x:usize ,y:usize, hashset:HashSet<usize>) {
+        self.data[y][x] = hashset;
     }
 
     pub fn get_tile(&self, id: usize) -> &Tile {
@@ -67,6 +76,13 @@ impl Board {
         self.data[y][x].len()
     }
 
+    pub fn remove_random(&mut self, x:usize, y:usize) {
+        let mut vec: Vec<usize> = self.data[y][x].clone().into_iter().collect();
+        let random = self.rng.gen_range(0..self.get_entropy(x, y));
+        vec.swap_remove(random);
+        self.data[y][x] = vec.into_iter().collect();
+    }
+
     pub fn remove_tile_from_data(&mut self, x:usize, y:usize, id: usize) {
         self.data[y][x].remove(&id);
     }
@@ -74,6 +90,7 @@ impl Board {
     pub fn init(&mut self, path: String) {
         for file in fs::read_dir(path).unwrap() {
             let path = file.unwrap().path();
+            let path_string = &path.to_str().unwrap().to_string();
             if fs::metadata(&path).unwrap().is_dir() {
                 continue;
             }
@@ -84,7 +101,7 @@ impl Board {
             sockets[2] = self.get_socket_id(&img, Direction::DOWN);
             sockets[3] = self.get_socket_id(&img, Direction::LEFT);
             for i in 0..4 {
-                let tile: Tile = Tile::new(self.tile_id, sockets.clone(), i);
+                let tile: Tile = Tile::new(self.tile_id, path_string.to_string() ,sockets.clone(), i);
                 self.tiles.insert(self.tile_id, tile);
                 self.tile_id += 1;
             }

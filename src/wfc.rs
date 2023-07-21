@@ -30,31 +30,32 @@ impl WFC {
     fn get_start_point(&mut self) -> (usize, usize) {
         println!("CALLED");
         let mut entropy = 0;
-        let mut rng = rand::thread_rng();
+        // let mut rng = rand::thread_rng();
+        // println!("{}",rng.gen_range(0..self.board.height()));
 
-        let mut index: (usize, usize) = (
-            rng.gen_range(0..self.board.width()),
-            rng.gen_range(0..self.board.height()),
-        );
-        // let mut index: (usize, usize);
-        // loop {
-        //     index = 
-        //         (
-        //             self.rng.gen_range(0..self.board.width()),
-        //             self.rng.gen_range(0..self.board.height()),
-        //         );
-        //     if self.board.get_entropy(index.0, index.1) != 1 {
-        //         break;
-        //     }
-        // }
+        // let mut index: (usize, usize) = (
+        //     rng.gen_range(0..self.board.width()),
+        //     rng.gen_range(0..self.board.height()),
+        // );
+        let mut index: (usize, usize);
+        loop {
+            index = 
+                (
+                    self.rng.gen_range(0..self.board.width()),
+                    self.rng.gen_range(0..self.board.height()),
+                );
+            if self.board.get_entropy(index.0, index.1) != 1 {
+                break;
+            }
+        }
 
         for y in 0..self.board.height() {
             for x in 0..self.board.width() {
                 let current = self.board.get(x,y);
-                if current.len() != 1 && current.len() < self.board.get(index.0, index.1).len() {
-                    index.0 = x;
-                    index.1 = y;
-                }
+                // if current.len() != 1 && current.len() > self.board.get(index.0, index.1).len() {
+                //     index.0 = x;
+                //     index.1 = y;
+             // }
                 if current.len() > entropy {
                     entropy = current.len();
                 }
@@ -69,9 +70,10 @@ impl WFC {
     }
 
     fn remove_randomly(&mut self, x: usize, y: usize) {
-        let entropy = self.board.get_entropy(x, y);
-        let random = self.rng.gen_range(0..entropy);
-        self.board.get_mut(x,y).remove(&random);
+        if self.board.get_entropy(x, y) <= 1 {
+            return;
+        }
+        self.board.remove_random(x, y);
     }
 
     fn reset_did_update(&mut self) {
@@ -145,12 +147,15 @@ impl WFC {
 
 
     pub fn run(&mut self) {
-        while self.entropy != 1 {
+        while self.entropy != 2 {
+        // for _ in 0..10000 {
             let index = self.get_start_point();
             self.remove_randomly(index.0, index.1);
             self.ripple(index.0, index.1);
-            println!("{}", self.entropy);
+            println!("ENTROPY {}", self.entropy);
         }
+        println!("DONE");
+        // dbg!(self.board.get_data());
     }
 
 

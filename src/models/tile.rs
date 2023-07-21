@@ -1,14 +1,16 @@
 
 pub struct Tile{
     id: usize,
+    src: String,
     sockets: Vec<usize>,
     rotation: usize,
 }
 
 impl Tile {
-    pub fn new(id: usize, sockets: Vec<usize>, rotation: usize) -> Self {
+    pub fn new(id: usize, src: String, sockets: Vec<usize>, rotation: usize) -> Self {
         Self {
             id,
+            src,
             sockets,
             rotation
         }
@@ -20,5 +22,9 @@ impl Tile {
 
     pub fn get_id(&self) -> usize {
         self.id
+    }
+
+    pub fn get_src(&self) -> String {
+        self.src.to_string()
     }
 }
