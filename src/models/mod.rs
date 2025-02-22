@@ -1,3 +1,3 @@
 pub mod tile;
-pub mod board;
+pub mod wave_function;
 pub mod direction;

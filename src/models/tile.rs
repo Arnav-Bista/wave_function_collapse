@@ -1,5 +1,4 @@
-
-pub struct Tile{
+pub struct Tile {
     id: usize,
     src: String,
     sockets: Vec<usize>,
@@ -12,7 +11,7 @@ impl Tile {
             id,
             src,
             sockets,
-            rotation
+            rotation,
         }
     }
 
